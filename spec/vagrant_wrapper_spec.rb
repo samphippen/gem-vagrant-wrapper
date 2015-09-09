@@ -94,9 +94,14 @@ describe VagrantWrapper do
       File.exists?(location).should be_true
     end
 
-    it "works for windows-1251 outputting binaries" do
-      allow(@v).to receive(:`).and_return(([205] + "END VAGRANT WRAPPER".bytes.to_a).pack("c*").force_encoding("utf-8"))
+    it "works for binaries which do not output valid utf-8" do
+      invalid_utf_8_string_encoded_as_utf8 = ([205] + "END VAGRANT WRAPPER".bytes.to_a).pack("c*").force_encoding("utf-8")
+      allow(@v).to receive(:`).and_return(invalid_utf_8_string_encoded_as_utf8)
+
+      # Doing this so we bypass the file executable check in the
+      # `#vagrant_location` instance method.
       allow(::File).to receive(:executable?).and_return(true)
+
       expect {
         @v.vagrant_location
       }.not_to raise_error

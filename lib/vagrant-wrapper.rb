@@ -131,7 +131,7 @@ class VagrantWrapper
       @search_paths.each do |path|
         test_bin = "#{path}/#{@vagrant_name}"
         next unless ::File.executable?(test_bin)
-        next if (%x{tail -n1 #{test_bin}}.match(@wrapper_mark) != nil)
+        next if (%x{tail -n1 #{test_bin}}.force_encoding("ASCII-8BIT").match(@wrapper_mark) != nil)
         @vagrant_path = test_bin
         break
       end

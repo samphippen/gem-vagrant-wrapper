@@ -93,6 +93,14 @@ describe VagrantWrapper do
       location.should match /vagrant$/
       File.exists?(location).should be_true
     end
+
+    it "works for windows-1251 outputting binaries" do
+      allow(@v).to receive(:`).and_return(([205] + "END VAGRANT WRAPPER".bytes.to_a).pack("c*").force_encoding("utf-8"))
+      allow(::File).to receive(:executable?).and_return(true)
+      expect {
+        @v.vagrant_location
+      }.not_to raise_error
+    end
   end
 
   describe "#get_output" do
